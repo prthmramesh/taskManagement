@@ -8,3 +8,7 @@ type User struct {
 }
 
 var jwtSecret []byte
+
+type contextKey string
+
+const userIDKey contextKey = "user_id"

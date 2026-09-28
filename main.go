@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -32,6 +33,11 @@ func main() {
 	mux.HandleFunc("POST /register", registerUser)
 
 	mux.HandleFunc("POST /login", loginUser)
+
+	mux.HandleFunc("GET /me", authMiddleware(func(w http.ResponseWriter, r *http.Request) {
+		id := r.Context().Value(userIDKey)
+		json.NewEncoder(w).Encode(map[string]any{"user_id": id})
+	}))
 
 	fmt.Println("Server listening on :8080")
 
