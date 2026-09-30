@@ -39,6 +39,9 @@ func main() {
 		json.NewEncoder(w).Encode(map[string]any{"user_id": id})
 	}))
 
+	mux.HandleFunc("POST /tasks", authMiddleware(createTask))
+	mux.HandleFunc("GET /tasks", authMiddleware(getTasks))
+
 	fmt.Println("Server listening on :8080")
 
 	srv := &http.Server{Addr: ":8080", Handler: mux}

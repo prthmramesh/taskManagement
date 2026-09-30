@@ -79,7 +79,6 @@ func authMiddleware(next http.HandlerFunc) http.HandlerFunc {
 
 		ctx := r.Context()
 		ctx = context.WithValue(ctx, userIDKey, int(userID))
-		r = r.WithContext(ctx)
 
 		slog.Info("request authenticated", "user_id", int(userID), "method", r.Method, "path", r.URL.Path)
 
