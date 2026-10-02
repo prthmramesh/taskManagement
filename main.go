@@ -42,6 +42,8 @@ func main() {
 	mux.HandleFunc("POST /tasks", authMiddleware(createTask))
 	mux.HandleFunc("GET /tasks", authMiddleware(getTasks))
 
+	mux.HandleFunc("GET /tasks/{id}", authMiddleware(getTaskByID))
+
 	fmt.Println("Server listening on :8080")
 
 	srv := &http.Server{Addr: ":8080", Handler: mux}

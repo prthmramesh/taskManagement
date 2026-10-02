@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"log/slog"
 	"net/http"
@@ -80,5 +81,29 @@ func getTasks(w http.ResponseWriter, r *http.Request) {
 }
 
 func getTaskByID(w http.ResponseWriter, r *http.Request) {
+	userID := r.Context().Value(userIDKey).(int)
 
+	taskID := r.PathValue("id")
+
+	var task Task
+	err := db.QueryRow("SELECT id, user_id, title, description, status, created_at, updated_at FROM tasks WHERE id=$1 AND user_id=$2", taskID, userID).Scan(&task.ID, &task.UserID, &task.Title, &task.Description, &task.Status, &task.CreatedAt, &task.UpdatedAt)
+
+	if err != nil {
+
+		if err == sql.ErrNoRows {
+			slog.Warn("task not found", "task_id", taskID, "user_id", userID)
+			http.Error(w, "Task not found", http.StatusNotFound)
+			return
+		} else {
+			http.Error(w, "Failed to fetch task", http.StatusInternalServerError)
+			slog.Error("get task failed", "user_id", userID, "task_id", taskID, "error", err.Error())
+		}
+		return
+
+	}
+
+	slog.Info("task fetched", "user_id", userID, "task_id", taskID)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(task)
 }
